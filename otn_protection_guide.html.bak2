@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTN Protection Switching: Complete Visual Guide & Interactive Simulator</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        otn: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                        },
+                        prot: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes pulseGlow {
+            0%, 100% { filter: drop-shadow(0 0 4px rgba(34, 197, 94, 0.6)); }
+            50% { filter: drop-shadow(0 0 12px rgba(34, 197, 94, 0.9)); }
+        }
+        @keyframes pulseGlowBlue {
+            0%, 100% { filter: drop-shadow(0 0 4px rgba(59, 130, 246, 0.6)); }
+            50% { filter: drop-shadow(0 0 12px rgba(59, 130, 246, 0.9)); }
+        }
+        @keyframes dashFlow {
+            to { stroke-dashoffset: -32; }
+        }
+        .animate-flow-working {
+            stroke-dasharray: 8, 8;
+            animation: dashFlow 1.2s linear infinite;
+        }
+        .animate-flow-prot {
+            stroke-dasharray: 8, 8;
+            animation: dashFlow 1.2s linear infinite;
+        }
+        .animate-flow-aps {
+            stroke-dasharray: 6, 6;
+            animation: dashFlow 0.8s linear infinite;
+        }
+        .code-pill {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            background-color: #1e293b;
+            color: #38bdf8;
+            padding: 0.15rem 0.4rem;
+            border-radius: 0.25rem;
+            font-size: 0.85em;
+        }
+    
+        /* Light mode overrides */
+        html.light body { background-color: #f8fafc; color: #1e293b; }
+        html.light .bg-slate-900 { background-color: #ffffff !important; }
+        html.light .bg-slate-950 { background-color: #f1f5f9 !important; }
+        html.light .bg-slate-800 { background-color: #f8fafc !important; }
+        html.light .bg-slate-800\/60 { background-color: rgba(248,250,252,0.6) !important; }
+        html.light .bg-slate-800\/70 { background-color: rgba(248,250,252,0.7) !important; }
+        html.light .bg-slate-800\/40 { background-color: rgba(248,250,252,0.4) !important; }
+        html.light .bg-slate-700 { background-color: #e2e8f0 !important; }
+        html.light .border-slate-800 { border-color: #e2e8f0 !important; }
+        html.light .border-slate-700 { border-color: #cbd5e1 !important; }
+        html.light .border-slate-700\/60 { border-color: rgba(203,213,225,0.6) !important; }
+        html.light .border-slate-700\/80 { border-color: rgba(203,213,225,0.8) !important; }
+        html.light .text-slate-100 { color: #1e293b !important; }
+        html.light .text-slate-200 { color: #334155 !important; }
+        html.light .text-slate-300 { color: #475569 !important; }
+        html.light .text-slate-400 { color: #64748b !important; }
+        html.light .text-slate-500 { color: #94a3b8 !important; }
+        html.light .text-slate-600 { color: #94a3b8 !important; }
+        html.light .text-slate-700 { color: #64748b !important; }
+        html.light .text-slate-800 { color: #334155 !important; }
+        html.light .text-white { color: #1e293b !important; }
+        html.light .text-emerald-400 { color: #059669 !important; }
+        html.light .text-emerald-300 { color: #10b981 !important; }
+        html.light .text-blue-400 { color: #2563eb !important; }
+        html.light .text-blue-300 { color: #3b82f6 !important; }
+        html.light .text-amber-400 { color: #d97706 !important; }
+        html.light .text-amber-300 { color: #f59e0b !important; }
+        html.light .text-purple-400 { color: #9333ea !important; }
+        html.light .text-purple-300 { color: #a855f7 !important; }
+        html.light .text-red-400 { color: #dc2626 !important; }
+        html.light .text-orange-400 { color: #ea580c !important; }
+        html.light .bg-blue-500\/20 { background-color: rgba(59,130,246,0.2) !important; }
+        html.light .bg-emerald-500\/20 { background-color: rgba(16,185,129,0.2) !important; }
+        html.light .bg-purple-500\/20 { background-color: rgba(168,85,247,0.2) !important; }
+        html.light .bg-amber-500\/20 { background-color: rgba(245,158,11,0.2) !important; }
+        html.light .bg-red-950\/40 { background-color: rgba(127,29,29,0.4) !important; }
+        html.light .bg-orange-950\/40 { background-color: rgba(124,45,18,0.4) !important; }
+        html.light .bg-yellow-950\/40 { background-color: rgba(113,63,18,0.4) !important; }
+        html.light .bg-emerald-950\/40 { background-color: rgba(6,78,59,0.4) !important; }
+        html.light .bg-blue-950\/40 { background-color: rgba(30,58,138,0.4) !important; }
+        html.light .bg-slate-950\/80 { background-color: rgba(15,23,42,0.8) !important; }
+        html.light .shadow-emerald-950\/20 { box-shadow: 0 0 0 0 rgba(6,78,59,0.2) !important; }
+        html.light .shadow-emerald-500\/20 { box-shadow: 0 0 0 0 rgba(16,185,129,0.2) !important; }
+        html.light .shadow-purple-600\/30 { box-shadow: 0 0 0 0 rgba(147,51,234,0.3) !important; }
+        html.light .shadow-red-600\/30 { box-shadow: 0 0 0 0 rgba(220,38,38,0.3) !important; }
+        html.light .shadow-amber-600\/30 { box-shadow: 0 0 0 0 rgba(217,119,6,0.3) !important; }
+        html.light .shadow-emerald-600\/30 { box-shadow: 0 0 0 0 rgba(5,150,105,0.3) !important; }
+        html.light .hover\:bg-slate-700:hover { background-color: #e2e8f0 !important; }
+        html.light .hover\:bg-slate-800:hover { background-color: #f1f5f9 !important; }
+        html.light .hover\:bg-blue-500:hover { background-color: #2563eb !important; }
+        html.light .hover\:bg-emerald-500:hover { background-color: #10b981 !important; }
+        html.light .hover\:bg-amber-500:hover { background-color: #f59e0b !important; }
+        html.light .hover\:bg-purple-500:hover { background-color: #a855f7 !important; }
+        html.light .hover\:bg-red-500:hover { background-color: #ef4444 !important; }
+        html.light .focus\:ring-blue-500:focus { --tw-ring-color: #3b82f6 !important; }
+        /* ensure selection colors */
+        html.light ::selection { background-color: #3b82f6; color: #ffffff; }
+
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 font-sans antialiased selection:bg-blue-500 selection:text-white min-h-screen">
+
+    <!-- Sticky Navigation Header -->
+    <header class="sticky top-0 z-50 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 shadow-xl">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-500 to-emerald-400 flex items-center justify-center font-black text-white text-xl shadow-lg shadow-blue-500/20">
+                    Ω
+                </div>
+                <div>
+                    <h1 class="text-lg font-bold tracking-tight text-white flex items-center gap-2">
+                        OTN Protection Switching
+                        <span class="hidden sm:inline-block px-2 py-0.5 text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded-full">ITU-T Standards</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">G.873.1 • G.873.2 • G.709 • G.798 • G.808.1</p>
+                </div>
+            </div>
+            
+            <nav class="hidden md:flex space-x-1 lg:space-x-2 text-xs lg:text-sm font-medium">
+                <a href="#mod-fundamentals" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition">1. Fundamentals</a>
+                <a href="#mod-linear" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition">2. Linear Schemes</a>
+                <a href="#mod-snc" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition">3. SNC Modes</a>
+                <a href="#mod-aps" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition">4. APS Protocol</a>
+                <a href="#mod-ring" class="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800 transition">5. Ring (OSPRing)</a>
+                <a href="#mod-simulator" class="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-semibold transition shadow-md shadow-blue-600/30">⚡ Live Simulator</a>
+            
+                <button id="theme-toggle" class="ml-4 px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-300 transition flex items-center gap-1" aria-label="Toggle light/dark mode">
+                    <svg id="icon-sun" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                    <svg id="icon-moon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                    <span id="theme-text">Light</span>
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-16">
+
+        <!-- Hero Section -->
+        <section class="relative rounded-3xl overflow-hidden bg-gradient-to-b from-slate-800/80 to-slate-900 border border-slate-700/60 p-8 sm:p-12 shadow-2xl">
+            <div class="absolute -right-20 -top-20 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -left-20 -bottom-20 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <div class="relative z-10 max-w-3xl space-y-4">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-xs font-medium text-emerald-400">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    Interactive Step-by-Step Educational Guide
+                </div>
+                <h2 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white">
+                    Optical Transport Network Protection Explained
+                </h2>
+                <p class="text-base sm:text-lg text-slate-300 leading-relaxed">
+                    Every second, petabits of critical telecommunications, financial services, and cloud data traverse optical fiber networks. When an optical fiber is severed or an optical transceiver degrades, <strong>OTN Protection Switching</strong> automatically restores the entire traffic payload in <strong>under 50 milliseconds</strong>.
+                </p>
+                <div class="pt-4 flex flex-wrap gap-3">
+                    <a href="#mod-simulator" class="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 font-bold text-white shadow-lg shadow-blue-600/30 transition transform hover:-translate-y-0.5">
+                        Launch Interactive Simulator &rarr;
+                    </a>
+                    <a href="#mod-fundamentals" class="px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-slate-700 font-semibold text-slate-200 transition">
+                        Explore Fundamentals
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODULE 1: FUNDAMENTALS -->
+        <section id="mod-fundamentals" class="space-y-8 scroll-mt-20">
+            <div class="border-b border-slate-800 pb-4">
+                <div class="text-xs font-bold text-blue-400 tracking-wider uppercase">Module 1</div>
+                <h2 class="text-2xl sm:text-3xl font-bold text-white mt-1">Fundamentals: Why and How Optical Networks Protect Themselves</h2>
+            </div>
+
+            <!-- Beginner Analogy & SLA -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-slate-800/60 rounded-2xl p-6 border border-slate-700/60 space-y-3">
+                    <div class="w-12 h-12 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-2xl font-bold">⚡</div>
+                    <h3 class="text-lg font-bold text-white">The < 50ms Carrier SLA</h3>
+                    <p class="text-sm text-slate-300 leading-relaxed">
+                        Telecommunications networks demand "Carrier-Grade 5-Nines" (99.999% availability). When a physical fiber snaps, the network must detect the failure, coordinate across hundreds of kilometers, and switch paths in <strong>less than 50 milliseconds</strong> so human phone calls and video streams do not drop.
+                    </p>
+                </div>
+                <div class="bg-slate-800/60 rounded-2xl p-6 border border-slate-700/60 space-y-3">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center text-2xl font-bold">🌉</div>
+                    <h3 class="text-lg font-bold text-white">The Bridge (Head-End)</h3>
+                    <p class="text-sm text-slate-300 leading-relaxed">
+                        The Bridge is located at the <strong>Source Node</strong>. It determines how user traffic enters the transmission medium:
+                        <br><strong class="text-emerald-400">Permanent Bridge (1+1):</strong> Replicates data continuously onto both Working and Protection fibers.
+                        <br><strong class="text-blue-400">Switched Bridge (1:N):</strong> Normally sends data only on Working; switches to Protection upon defect.
+                    </p>
+                </div>
+                <div class="bg-slate-800/60 rounded-2xl p-6 border border-slate-700/60 space-y-3">
+                    <div class="w-12 h-12 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-2xl font-bold">🔀</div>
+                    <h3 class="text-lg font-bold text-white">The Selector (Tail-End)</h3>
+                    <p class="text-sm text-slate-300 leading-relaxed">
+                        The Selector is located at the <strong>Destination Node</strong>. It acts as an optical/electrical switch choosing which incoming line supplies the client payload. If the Working line suffers Loss of Signal (LOS) or Signal Degrade (SD), the selector flips to the Protection line.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Working vs Protection vs Extra Traffic Diagram -->
+            <div class="bg-slate-800/40 rounded-2xl p-6 sm:p-8 border border-slate-700/60">
+                <h3 class="text-xl font-bold text-white mb-4">Traffic & Entity Terminology (ITU-T G.808.1 & G.873.1)</h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+                    <div class="p-4 rounded-xl bg-emerald-950/40 border border-emerald-500/30">
+                        <span class="font-bold text-emerald-400 block mb-1">1. Normal Traffic Signal (Working)</span>
+                        The primary high-priority client payload (e.g. 100GbE / ODU4) that is protected by the architecture.
+                    </div>
+                    <div class="p-4 rounded-xl bg-blue-950/40 border border-blue-500/30">
+                        <span class="font-bold text-blue-400 block mb-1">2. Protection Entity (Backup)</span>
+                        The secondary optical channel / path reserved to restore normal traffic when the working entity fails.
+                    </div>
+                    <div class="p-4 rounded-xl bg-amber-950/40 border border-amber-500/30">
+                        <span class="font-bold text-amber-400 block mb-1">3. Extra Traffic (ET)</span>
+                        Low-priority, pre-emptible traffic carried over an idle protection entity in 1:1 or 1:N architectures. Instantly dropped if a protection switch occurs.
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODULE 2: LINEAR PROTECTION SCHEMES (ITU-T G.873.1) -->
+        <section id="mod-linear" class="space-y-8 scroll-mt-20">
+            <div class="border-b border-slate-800 pb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <div class="text-xs font-bold text-blue-400 tracking-wider uppercase">Module 2</div>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-white mt-1">Linear Protection Schemes (ITU-T G.873.1)</h2>
+                </div>
+            </div>
+
+            <!-- Interactive Architecture Switcher -->
+            <div class="bg-slate-800/70 rounded-3xl border border-slate-700/80 p-6 sm:p-8 space-y-6">
+                
+                <!-- Architecture Selection Tabs -->
+                <div class="flex flex-wrap gap-2 sm:gap-3 border-b border-slate-700/80 pb-4" id="arch-tabs">
+                    <button onclick="selectArch('1plus1_unidir')" id="btn-1plus1_unidir" class="arch-tab-btn px-4 py-2 rounded-xl text-sm font-bold bg-blue-600 text-white shadow-lg transition">
+                        1+1 Unidirectional
+                    </button>
+                    <button onclick="selectArch('1plus1_bidir')" id="btn-1plus1_bidir" class="arch-tab-btn px-4 py-2 rounded-xl text-sm font-bold bg-slate-800 text-slate-400 hover:text-slate-200 transition">
+                        1+1 Bidirectional
+                    </button>
+                    <button onclick="selectArch('1to1_bidir')" id="btn-1to1_bidir" class="arch-tab-btn px-4 py-2 rounded-xl text-sm font-bold bg-slate-800 text-slate-400 hover:text-slate-200 transition">
+                        1:1 Bidirectional (Extra Traffic)
+                    </button>
+                    <button onclick="selectArch('1ton_bidir')" id="btn-1ton_bidir" class="arch-tab-btn px-4 py-2 rounded-xl text-sm font-bold bg-slate-800 text-slate-400 hover:text-slate-200 transition">
+                        1:N Bidirectional (N Working : 1 Protection)
+                    </button>
+                </div>
+
+                <!-- Active Architecture Explanation & SVG Diagram -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                    
+                    <!-- Diagram Canvas (7 Cols) -->
+                    <div class="lg:col-span-7 bg-slate-950/80 rounded-2xl border border-slate-800 p-4 sm:p-6 flex flex-col items-center justify-center relative min-h-[340px]">
+                        <div class="absolute top-3 left-4 text-xs font-mono text-slate-400 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+                            <span id="arch-diagram-title">1+1 Unidirectional Architecture</span>
+                        </div>
+                        
+                        <div class="w-full max-w-lg mt-4">
+                            <svg viewBox="0 0 540 260" class="w-full h-auto drop-shadow-md">
+                                <defs>
+                                    <marker id="arrow-w" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                                        <path d="M 0 1 L 10 5 L 0 9 z" fill="#22c55e" />
+                                    </marker>
+                                    <marker id="arrow-p" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                                        <path d="M 0 1 L 10 5 L 0 9 z" fill="#3b82f6" />
+                                    </marker>
+                                    <marker id="arrow-aps" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                                        <path d="M 0 1 L 10 5 L 0 9 z" fill="#c084fc" />
+                                    </marker>
+                                </defs>
+
+                                <!-- Working Line (Top) -->
+                                <path id="svg-working-line" d="M 140 80 L 400 80" stroke="#22c55e" stroke-width="4" fill="none" marker-end="url(#arrow-w)" />
+                                <text x="270" y="68" fill="#22c55e" font-size="12" font-family="monospace" font-weight="bold" text-anchor="middle">Working Entity (Primary)</text>
+
+                                <!-- Protection Line (Bottom) -->
+                                <path id="svg-prot-line" d="M 140 180 L 400 180" stroke="#3b82f6" stroke-width="4" stroke-dasharray="6 4" fill="none" marker-end="url(#arrow-p)" />
+                                <text x="270" y="200" fill="#3b82f6" font-size="12" font-family="monospace" font-weight="bold" text-anchor="middle">Protection Entity (Backup)</text>
+
+                                <!-- APS Signalling Line (Conditional) -->
+                                <path id="svg-aps-line" d="M 400 130 L 140 130" stroke="#c084fc" stroke-width="2" stroke-dasharray="4 4" fill="none" marker-end="url(#arrow-aps)" opacity="0" />
+                                <text id="svg-aps-text" x="270" y="124" fill="#c084fc" font-size="11" font-family="monospace" text-anchor="middle" opacity="0">APS/PCC Signaling Channel (ODU Row 4)</text>
+
+                                <!-- Node A (Left) -->
+                                <rect x="40" y="50" width="100" height="160" rx="16" fill="#0f172a" stroke="#334155" stroke-width="3" />
+                                <text x="90" y="78" fill="#f8fafc" font-weight="bold" font-size="16" text-anchor="middle">Node A</text>
+                                <text x="90" y="94" fill="#64748b" font-size="10" text-anchor="middle">(Head-End)</text>
+                                
+                                <!-- Bridge Component inside Node A -->
+                                <g id="svg-bridge-box">
+                                    <circle cx="90" cy="130" r="14" fill="#1e293b" stroke="#38bdf8" stroke-width="2" />
+                                    <text x="90" y="134" fill="#38bdf8" font-size="10" font-weight="bold" text-anchor="middle">B</text>
+                                    <line x1="90" y1="130" x2="140" y2="80" stroke="#22c55e" stroke-width="3" />
+                                    <line id="svg-bridge-prot-conn" x1="90" y1="130" x2="140" y2="180" stroke="#3b82f6" stroke-width="3" />
+                                    <line x1="10" y1="130" x2="76" y2="130" stroke="#f8fafc" stroke-width="3" />
+                                    <text x="20" y="122" fill="#94a3b8" font-size="9">Tx In</text>
+                                </g>
+
+                                <!-- Node B (Right) -->
+                                <rect x="400" y="50" width="100" height="160" rx="16" fill="#0f172a" stroke="#334155" stroke-width="3" />
+                                <text x="450" y="78" fill="#f8fafc" font-weight="bold" font-size="16" text-anchor="middle">Node B</text>
+                                <text x="450" y="94" fill="#64748b" font-size="10" text-anchor="middle">(Tail-End)</text>
+                                
+                                <!-- Selector Component inside Node B -->
+                                <g id="svg-selector-box">
+                                    <circle cx="450" cy="130" r="14" fill="#1e293b" stroke="#22c55e" stroke-width="2" id="svg-sel-circle" />
+                                    <text x="450" y="134" fill="#22c55e" font-size="10" font-weight="bold" text-anchor="middle" id="svg-sel-letter">S</text>
+                                    <line id="svg-sel-arm" x1="450" y1="130" x2="400" y2="80" stroke="#22c55e" stroke-width="4" />
+                                    <line x1="464" y1="130" x2="530" y2="130" stroke="#f8fafc" stroke-width="3" />
+                                    <text x="515" y="122" fill="#94a3b8" font-size="9">Rx Out</text>
+                                </g>
+                            </svg>
+                        </div>
+
+                        <div class="mt-4 flex gap-4 text-xs font-mono text-slate-400">
+                            <span class="flex items-center gap-1.5"><span class="w-3 h-1 bg-emerald-500 rounded"></span> Working Path</span>
+                            <span class="flex items-center gap-1.5"><span class="w-3 h-1 bg-blue-500 rounded"></span> Protection Path</span>
+                            <span class="flex items-center gap-1.5"><span class="w-3 h-1 bg-purple-400 rounded"></span> APS/PCC Overhead</span>
+                        </div>
+                    </div>
+
+                    <!-- Narrative Breakdown (5 Cols) -->
+                    <div class="lg:col-span-5 space-y-4" id="arch-narrative">
+                        <div class="flex items-center gap-2">
+                            <span id="arch-badge" class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Permanent Bridge</span>
+                            <span id="arch-aps-req" class="px-2.5 py-1 rounded-full text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700">No APS Required</span>
+                        </div>
+                        <h3 id="arch-title" class="text-xl font-bold text-white">1+1 Unidirectional Protection</h3>
+                        <p id="arch-desc" class="text-sm text-slate-300 leading-relaxed">
+                            In 1+1 Unidirectional switching, the Head-End (Node A) uses a <strong>Permanent Bridge</strong> to duplicate client data simultaneously across both working and protection links. The Tail-End (Node B) monitors the working signal locally; if a defect occurs, Node B immediately switches its selector without consulting Node A.
+                        </p>
+                        
+                        <div class="space-y-2 pt-2 text-xs text-slate-300 font-mono">
+                            <div class="p-3 rounded-lg bg-slate-950/60 border border-slate-800 flex justify-between">
+                                <span class="text-slate-400">Switching Trigger:</span>
+                                <span id="arch-trigger" class="text-emerald-400 font-semibold">Local Tail-End Defect (LOS / SD)</span>
+                            </div>
+                            <div class="p-3 rounded-lg bg-slate-950/60 border border-slate-800 flex justify-between">
+                                <span class="text-slate-400">Bandwidth Efficiency:</span>
+                                <span id="arch-efficiency" class="text-amber-400 font-semibold">50% (Dedicated 1:1 Redundancy)</span>
+                            </div>
+                            <div class="p-3 rounded-lg bg-slate-950/60 border border-slate-800 flex justify-between">
+                                <span class="text-slate-400">Switching Speed:</span>
+                                <span id="arch-speed" class="text-emerald-400 font-semibold">Fastest (< 10ms - No Handshake)</span>
+                            </div>
+                        </div>
+
+                        <!-- Revertive vs Non-Revertive Mode Callout -->
+                        <div class="p-4 rounded-xl bg-blue-950/40 border border-blue-500/30 text-xs text-blue-200 leading-relaxed">
+                            <strong>Revertive vs Non-Revertive:</strong>
+                            <br>• <strong>Revertive:</strong> When the repaired fiber becomes stable, the <em>Wait-to-Restore (WTR) timer</em> (5–12 mins) elapses and traffic reverts to Working.
+                            <br>• <strong>Non-Revertive (DNR):</strong> Traffic remains on Protection to avoid a second disruption hit.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODULE 3: SUBNETWORK CONNECTION (SNC) MONITORING MODES -->
+        <section id="mod-snc" class="space-y-8 scroll-mt-20">
+            <div class="border-b border-slate-800 pb-4">
+                <div class="text-xs font-bold text-blue-400 tracking-wider uppercase">Module 3</div>
+                <h2 class="text-2xl sm:text-3xl font-bold text-white mt-1">Subnetwork Connection (SNC) Monitoring Modes</h2>
+                <p class="text-sm text-slate-400 mt-1">How OTN decides when to switch: Inherent (SNC/I), Sublayer (SNC/S), and Non-Intrusive (SNC/N) monitoring.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <!-- SNC/I -->
+                <div class="bg-slate-800/60 rounded-2xl p-6 border border-slate-700/60 flex flex-col justify-between space-y-4">
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="px-2.5 py-1 rounded bg-blue-500/20 text-blue-300 font-mono text-xs font-bold">SNC/I</span>
+                            <span class="text-xs text-slate-400">Inherent Monitoring</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white">Server-Layer Monitored</h3>
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            SNC/I relies entirely on the server layer trail (such as the OTUk frame or higher-order ODUk server) to detect faults.
+                        </p>
+                        <ul class="text-xs text-slate-400 space-y-1.5 list-disc ml-4 font-mono">
+                            <li>Trigger: OTUk-LOS, OTUk-LOF, OTUk-BDI.</li>
+                            <li>Does not require ODUk TCM overhead.</li>
+                            <li>Simple, low complexity for link-by-link protection.</li>
+                        </ul>
+                    </div>
+                    <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 text-[11px] text-slate-400 font-mono">
+                        MFAS bits 6-8: <span class="text-emerald-400">1 1 1</span> (Server Layer)
+                    </div>
+                </div>
+
+                <!-- SNC/S -->
+                <div class="bg-slate-800/60 rounded-2xl p-6 border border-emerald-500/40 flex flex-col justify-between space-y-4 shadow-lg shadow-emerald-950/20">
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="px-2.5 py-1 rounded bg-emerald-500/20 text-emerald-300 font-mono text-xs font-bold">SNC/S</span>
+                            <span class="text-xs text-emerald-400 font-semibold">Recommended</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white">Sublayer Monitored (TCM)</h3>
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            SNC/S assigns a dedicated <strong>Tandem Connection Monitoring (TCM1–TCM6)</strong> level specifically to the protection subnetwork.
+                        </p>
+                        <ul class="text-xs text-slate-400 space-y-1.5 list-disc ml-4 font-mono">
+                            <li>Trigger: ODUkT-SSF, ODUkT-SSD, ODUkT-TIM.</li>
+                            <li>Isolates faults to the protected subnetwork boundary.</li>
+                            <li>Ignores upstream faults outside the protected zone.</li>
+                        </ul>
+                    </div>
+                    <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 text-[11px] text-slate-400 font-mono">
+                        MFAS bits 6-8: <span class="text-emerald-400">0 0 1 – 1 1 0</span> (TCM1–TCM6)
+                    </div>
+                </div>
+
+                <!-- SNC/Ne / SNC/Ns -->
+                <div class="bg-slate-800/60 rounded-2xl p-6 border border-slate-700/60 flex flex-col justify-between space-y-4">
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <span class="px-2.5 py-1 rounded bg-purple-500/20 text-purple-300 font-mono text-xs font-bold">SNC/N</span>
+                            <span class="text-xs text-slate-400">Non-Intrusive Monitoring</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white">End-to-End Sniffing</h3>
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            SNC/Ne "sniffs" the end-to-end ODUk Path (ODUkP) overhead at intermediate protection switches without terminating or modifying the trail.
+                        </p>
+                        <ul class="text-xs text-slate-400 space-y-1.5 list-disc ml-4 font-mono">
+                            <li>Trigger: ODUk-AIS, ODUk-OCI, ODUk-LCK, dDEG.</li>
+                            <li>Useful for client subnetwork protection.</li>
+                            <li>Cannot differentiate between local vs remote faults.</li>
+                        </ul>
+                    </div>
+                    <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 text-[11px] text-slate-400 font-mono">
+                        MFAS bits 6-8: <span class="text-emerald-400">0 0 0</span> (ODUk Path level)
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODULE 4: THE 4-BYTE APS/PCC PROTOCOL (ITU-T G.709 & G.873.1) -->
+        <section id="mod-aps" class="space-y-8 scroll-mt-20">
+            <div class="border-b border-slate-800 pb-4">
+                <div class="text-xs font-bold text-blue-400 tracking-wider uppercase">Module 4</div>
+                <h2 class="text-2xl sm:text-3xl font-bold text-white mt-1">The 4-Byte APS/PCC Protocol & G.709 Overhead</h2>
+                <p class="text-sm text-slate-400 mt-1">Row 4, Columns 5 to 8 of the ODUk overhead control all linear and ring protection signaling.</p>
+            </div>
+
+            <!-- G.709 Frame Map Visualization -->
+            <div class="bg-slate-800/60 rounded-3xl p-6 sm:p-8 border border-slate-700/80 space-y-6">
+                <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                    <span>🗺️</span> ITU-T G.709 ODUk Overhead Allocation Map
+                </h3>
+                
+                <div class="overflow-x-auto">
+                    <div class="min-w-[700px] bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-xs text-center space-y-2">
+                        <!-- Header Columns -->
+                        <div class="grid grid-cols-16 gap-1 text-[10px] text-slate-500 font-bold mb-1">
+                            <div class="col-span-1">Col 1</div><div class="col-span-1">2</div><div class="col-span-1">3</div><div class="col-span-1">4</div>
+                            <div class="col-span-1 text-emerald-400">5</div><div class="col-span-1 text-emerald-400">6</div><div class="col-span-1 text-emerald-400">7</div><div class="col-span-1 text-emerald-400">8</div>
+                            <div class="col-span-1">9</div><div class="col-span-1">10</div><div class="col-span-1">11</div><div class="col-span-1">12</div>
+                            <div class="col-span-1">13</div><div class="col-span-1">14</div><div class="col-span-2">15-16</div>
+                        </div>
+                        
+                        <!-- Row 1 -->
+                        <div class="grid grid-cols-16 gap-1">
+                            <div class="col-span-7 bg-slate-800/80 py-2 rounded text-slate-400 border border-slate-700">OA1, OA2 (Frame Align) + MFAS</div>
+                            <div class="col-span-7 bg-slate-800/80 py-2 rounded text-slate-400 border border-slate-700">OTUk Section Monitoring (SM) / GCC0</div>
+                            <div class="col-span-2 bg-slate-800/40 py-2 rounded text-slate-600">JC</div>
+                        </div>
+
+                        <!-- Row 2 & 3 -->
+                        <div class="grid grid-cols-16 gap-1">
+                            <div class="col-span-3 bg-slate-800/60 py-2 rounded text-slate-400 border border-slate-700">TCM6 / TCM5</div>
+                            <div class="col-span-3 bg-slate-800/60 py-2 rounded text-slate-400 border border-slate-700">TCM4 / FTFL</div>
+                            <div class="col-span-2 bg-slate-800/60 py-2 rounded text-slate-400 border border-slate-700">TCM3</div>
+                            <div class="col-span-2 bg-slate-800/60 py-2 rounded text-slate-400 border border-slate-700">TCM2</div>
+                            <div class="col-span-2 bg-slate-800/60 py-2 rounded text-slate-400 border border-slate-700">TCM1</div>
+                            <div class="col-span-2 bg-slate-800/60 py-2 rounded text-slate-400 border border-slate-700">PM Overhead</div>
+                            <div class="col-span-2 bg-slate-800/40 py-2 rounded text-slate-600">JC</div>
+                        </div>
+
+                        <!-- Row 4: APS/PCC HIGHLIGHTED -->
+                        <div class="grid grid-cols-16 gap-1">
+                            <div class="col-span-2 bg-slate-800/60 py-2.5 rounded text-slate-400 border border-slate-700">GCC1 (Col 1-2)</div>
+                            <div class="col-span-2 bg-slate-800/60 py-2.5 rounded text-slate-400 border border-slate-700">GCC2 (Col 3-4)</div>
+                            <!-- APS/PCC Field -->
+                            <div class="col-span-4 bg-gradient-to-r from-emerald-600 to-blue-600 py-2.5 rounded text-white font-bold border-2 border-emerald-400 shadow-lg shadow-emerald-500/20 animate-pulse">
+                                APS / PCC Bytes (Col 5, 6, 7, 8)
+                            </div>
+                            <div class="col-span-6 bg-slate-800/60 py-2.5 rounded text-slate-500 border border-slate-700">Reserved (RES) Col 9-14</div>
+                            <div class="col-span-2 bg-slate-800/40 py-2.5 rounded text-slate-600">PSI</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Interactive 4-Byte Bit Inspector & Decoder -->
+                <div class="bg-slate-950/80 rounded-2xl p-6 border border-slate-800 space-y-6">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+                        <h4 class="text-base font-bold text-white flex items-center gap-2">
+                            <span class="w-3 h-3 rounded-full bg-blue-500"></span>
+                            Interactive APS 32-Bit Protocol Calculator & Inspector
+                        </h4>
+                        <span class="text-xs font-mono text-slate-400">ITU-T G.873.1 Clause 9</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                        <!-- Interactive Form Selectors (5 Cols) -->
+                        <div class="lg:col-span-5 space-y-4 text-xs font-sans">
+                            <div>
+                                <label class="block font-bold text-slate-300 mb-1">Request Type (Byte 1, Bits 1–4):</label>
+                                <select id="calc-req" onchange="updateApsCalc()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2.5 text-white font-mono text-xs focus:ring-2 focus:ring-blue-500 outline-none">
+                                    <option value="1111">1111 - Lockout of Protection (LoP) [Priority 1]</option>
+                                    <option value="1110">1110 - Forced Switch (FS) [Priority 2]</option>
+                                    <option value="1100" selected>1100 - Signal Fail (SF) [Priority 3 - Fiber Cut]</option>
+                                    <option value="1010">1010 - Signal Degrade (SD) [Priority 4 - High BER]</option>
+                                    <option value="1000">1000 - Manual Switch (MS) [Priority 5]</option>
+                                    <option value="0110">0110 - Wait-to-Restore (WTR) [Priority 6]</option>
+                                    <option value="0100">0100 - Exercise (EXER) [Priority 7]</option>
+                                    <option value="0010">0010 - Reverse Request (RR) [Priority 8]</option>
+                                    <option value="0001">0001 - Do Not Revert (DNR) [Priority 9]</option>
+                                    <option value="0000">0000 - No Request (NR) [Priority 10 - Normal]</option>
+                                </select>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block font-bold text-slate-300 mb-1">Arch (Bit 6 'B'):</label>
+                                    <select id="calc-b" onchange="updateApsCalc()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white font-mono text-xs">
+                                        <option value="0" selected>0 = 1+1 Permanent</option>
+                                        <option value="1">1 = 1:N Switched</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block font-bold text-slate-300 mb-1">Direction (Bit 7 'D'):</label>
+                                    <select id="calc-d" onchange="updateApsCalc()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white font-mono text-xs">
+                                        <option value="0">0 = Unidirectional</option>
+                                        <option value="1" selected>1 = Bidirectional</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block font-bold text-slate-300 mb-1">Revertive (Bit 8 'R'):</label>
+                                    <select id="calc-r" onchange="updateApsCalc()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white font-mono text-xs">
+                                        <option value="0">0 = Non-Revertive</option>
+                                        <option value="1" selected>1 = Revertive</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block font-bold text-slate-300 mb-1">Requested Signal (Byte 2):</label>
+                                    <select id="calc-req-sig" onchange="updateApsCalc()" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-white font-mono text-xs">
+                                        <option value="00000000">0 = Null Signal</option>
+                                        <option value="00000001" selected>1 = Working Signal #1</option>
+                                        <option value="00000010">2 = Working Signal #2</option>
+                                        <option value="11111111">255 = Extra Traffic</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Live Binary & Hex Stream Display (7 Cols) -->
+                        <div class="lg:col-span-7 bg-slate-900 rounded-xl p-5 border border-slate-800 flex flex-col justify-between space-y-4">
+                            <div>
+                                <div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-3">Computed 32-Bit Frame Hex & Binary</div>
+                                <div class="grid grid-cols-4 gap-2 text-center font-mono">
+                                    <!-- Byte 1 -->
+                                    <div class="bg-slate-950 p-2.5 rounded-lg border border-blue-500/40">
+                                        <div class="text-[10px] text-slate-500">BYTE 1 (Req/Type)</div>
+                                        <div id="hex-b1" class="text-lg font-bold text-blue-400 my-1">0xCD</div>
+                                        <div id="bin-b1" class="text-[11px] text-slate-300">1100 1101</div>
+                                    </div>
+                                    <!-- Byte 2 -->
+                                    <div class="bg-slate-950 p-2.5 rounded-lg border border-emerald-500/40">
+                                        <div class="text-[10px] text-slate-500">BYTE 2 (Req Sig)</div>
+                                        <div id="hex-b2" class="text-lg font-bold text-emerald-400 my-1">0x01</div>
+                                        <div id="bin-b2" class="text-[11px] text-slate-300">0000 0001</div>
+                                    </div>
+                                    <!-- Byte 3 -->
+                                    <div class="bg-slate-950 p-2.5 rounded-lg border border-purple-500/40">
+                                        <div class="text-[10px] text-slate-500">BYTE 3 (Bdg Sig)</div>
+                                        <div id="hex-b3" class="text-lg font-bold text-purple-400 my-1">0x01</div>
+                                        <div id="bin-b3" class="text-[11px] text-slate-300">0000 0001</div>
+                                    </div>
+                                    <!-- Byte 4 -->
+                                    <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-700">
+                                        <div class="text-[10px] text-slate-500">BYTE 4 (Rsvd)</div>
+                                        <div class="text-lg font-bold text-slate-500 my-1">0x00</div>
+                                        <div class="text-[11px] text-slate-600">0000 0000</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Human Explanation Box -->
+                            <div class="p-3.5 rounded-lg bg-slate-950 border border-slate-800 text-xs font-mono text-slate-300 leading-relaxed" id="calc-explanation">
+                                <strong>Decoded Message:</strong> Node indicates <span class="text-amber-400">Signal Fail (SF)</span> on Working Signal #1, requesting <span class="text-blue-400">1+1 Bidirectional Revertive</span> protection switch.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Priority Hierarchy Table -->
+                <div class="space-y-3">
+                    <h4 class="text-sm font-bold text-white">ITU-T G.873.1 Request Priority Table (Top to Bottom)</h4>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2 text-xs font-mono">
+                        <div class="p-2.5 rounded bg-red-950/40 border border-red-500/40 text-red-300">1. LoP (1111)</div>
+                        <div class="p-2.5 rounded bg-orange-950/40 border border-orange-500/40 text-orange-300">2. FS (1110)</div>
+                        <div class="p-2.5 rounded bg-amber-950/40 border border-amber-500/40 text-amber-300">3. SF (1100)</div>
+                        <div class="p-2.5 rounded bg-yellow-950/40 border border-yellow-500/40 text-yellow-300">4. SD (1010)</div>
+                        <div class="p-2.5 rounded bg-blue-950/40 border border-blue-500/40 text-blue-300">5. MS (1000)</div>
+                        <div class="p-2.5 rounded bg-emerald-950/40 border border-emerald-500/40 text-emerald-300">6. WTR (0110)</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODULE 5: RING PROTECTION — ODU SPRing (ITU-T G.873.2) -->
+        <section id="mod-ring" class="space-y-8 scroll-mt-20">
+            <div class="border-b border-slate-800 pb-4">
+                <div class="text-xs font-bold text-blue-400 tracking-wider uppercase">Module 5</div>
+                <h2 class="text-2xl sm:text-3xl font-bold text-white mt-1">ODU Shared Ring Protection (OSPRing / G.873.2)</h2>
+                <p class="text-sm text-slate-400 mt-1">Comparing the two standardized ring restoration mechanisms: Wrapping vs Steering.</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Wrapping Card -->
+                <div class="bg-slate-800/60 rounded-3xl p-6 sm:p-8 border border-slate-700/60 space-y-4 flex flex-col justify-between">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-xl font-bold text-white">1. Wrapping Mechanism</h3>
+                            <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">Adjacent Loopback</span>
+                        </div>
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            When a link breaks between adjacent Node A and Node B, both nodes execute a <strong>local U-turn</strong>. Node A wraps Eastbound traffic onto the Westbound protection ring.
+                        </p>
+                        <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 text-xs text-slate-300 space-y-2 font-mono">
+                            <div class="text-emerald-400 font-bold">+ Advantages:</div>
+                            <div>• Instant local action (< 50ms). Only adjacent nodes need to flip switches.</div>
+                            <div class="text-red-400 font-bold pt-1">- Disadvantages:</div>
+                            <div>• "Trombone Effect": Signals traverse the ring up to 3 times, tripling propagation delay.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Steering Card -->
+                <div class="bg-slate-800/60 rounded-3xl p-6 sm:p-8 border border-slate-700/60 space-y-4 flex flex-col justify-between">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-xl font-bold text-white">2. Steering Mechanism</h3>
+                            <span class="px-2.5 py-1 rounded-full text-xs font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30">Long-Haul Optimized</span>
+                        </div>
+                        <p class="text-sm text-slate-300 leading-relaxed">
+                            When a failure occurs, ring nodes broadcast APS notifications to the original <strong>Source and Destination nodes</strong>, which redirect the traffic the opposite way around the ring.
+                        </p>
+                        <div class="p-4 bg-slate-950 rounded-xl border border-slate-800 text-xs text-slate-300 space-y-2 font-mono">
+                            <div class="text-emerald-400 font-bold">+ Advantages:</div>
+                            <div>• Minimal latency: Direct path around the ring without unnecessary looping. Essential for rings >1500km.</div>
+                            <div class="text-amber-400 font-bold pt-1">- Requirements:</div>
+                            <div>• Requires full ring node coordination via APS protocol before rerouting.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Squelching / Squash Table Callout -->
+            <div class="bg-slate-800/40 rounded-2xl p-6 border border-slate-700/60 space-y-3">
+                <h4 class="text-base font-bold text-white flex items-center gap-2">
+                    <span>🛡️</span> Misconnection Prevention: The Squelch (Squash) Table
+                </h4>
+                <p class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+                    In multi-node ring networks experiencing multiple simultaneous cable cuts or node isolating failures, wrapped traffic could accidentally be delivered to the wrong customer node. ITU-T G.873.2 mandates a <strong>Squelch Table</strong> in every network element. If a destination node is severed, intermediate nodes insert <span class="code-pill">ODUk-OCI</span> (Open Connection Indication) or <span class="code-pill">ODUk-AIS</span> to intentionally drop the traffic rather than risk private data leakage.
+                </p>
+            </div>
+        </section>
+
+        <!-- MODULE 6: LIVE INTERACTIVE SIMULATOR & PLAYGROUND -->
+        <section id="mod-simulator" class="space-y-8 scroll-mt-20">
+            <div class="border-b border-slate-800 pb-4">
+                <div class="text-xs font-bold text-emerald-400 tracking-wider uppercase">Module 6</div>
+                <h2 class="text-2xl sm:text-3xl font-bold text-white mt-1">⚡ Interactive Protection Playground & Simulator</h2>
+                <p class="text-sm text-slate-400 mt-1">Inject real physical faults, operator commands, and observe the sub-50ms ITU-T protection switching sequence in real-time.</p>
+            </div>
+
+            <!-- Simulation Canvas Card -->
+            <div class="bg-slate-950 rounded-3xl border border-slate-800 shadow-2xl overflow-hidden">
+                
+                <!-- Simulator Header Controls -->
+                <div class="bg-slate-900/80 px-6 py-4 border-b border-slate-800 flex flex-wrap items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-3 h-3 rounded-full bg-emerald-400 animate-pulse" id="sim-status-dot"></div>
+                        <span class="font-mono font-bold text-sm text-white" id="sim-status-text">Network State: NORMAL (Carrying Traffic on Working Entity)</span>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <button onclick="resetSimulator()" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-mono font-semibold text-slate-300 transition border border-slate-700">
+                            ⟲ Reset Simulator
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Visual Simulation Canvas (SVG) -->
+                <div class="p-6 sm:p-10 relative flex flex-col items-center justify-center bg-radial from-slate-900 to-slate-950 min-h-[380px]">
+                    
+                    <svg id="sim-svg" viewBox="0 0 700 280" class="w-full max-w-3xl h-auto">
+                        <!-- Working Fiber Link (Top) -->
+                        <path id="sim-working-line" d="M 160 90 L 540 90" stroke="#22c55e" stroke-width="6" stroke-linecap="round" fill="none" />
+                        <!-- Flow Animation on Working -->
+                        <path id="sim-working-flow" d="M 160 90 L 540 90" stroke="#ffffff" stroke-width="4" class="animate-flow-working" fill="none" opacity="0.9" />
+                        <text x="350" y="75" fill="#22c55e" font-size="12" font-family="monospace" font-weight="bold" text-anchor="middle" id="sim-working-label">WORKING FIBER [ACTIVE]</text>
+
+                        <!-- Fiber Cut / Fault Marker -->
+                        <g id="sim-fault-marker" opacity="0" class="transition-opacity duration-300">
+                            <circle cx="350" cy="90" r="18" fill="#ef4444" fill-opacity="0.2" stroke="#ef4444" stroke-width="2" />
+                            <line x1="340" y1="80" x2="360" y2="100" stroke="#ef4444" stroke-width="4" stroke-linecap="round" />
+                            <line x1="360" y1="80" x2="340" y2="100" stroke="#ef4444" stroke-width="4" stroke-linecap="round" />
+                            <text x="350" y="125" fill="#ef4444" font-size="11" font-family="monospace" font-weight="bold" text-anchor="middle">FIBER CUT (LOS)</text>
+                        </g>
+
+                        <!-- Protection Fiber Link (Bottom) -->
+                        <path id="sim-prot-line" d="M 160 190 L 540 190" stroke="#3b82f6" stroke-width="6" stroke-linecap="round" stroke-dasharray="10 6" fill="none" />
+                        <!-- Flow Animation on Protection -->
+                        <path id="sim-prot-flow" d="M 160 190 L 540 190" stroke="#ffffff" stroke-width="4" class="animate-flow-prot" fill="none" opacity="0" />
+                        <text x="350" y="215" fill="#3b82f6" font-size="12" font-family="monospace" font-weight="bold" text-anchor="middle" id="sim-prot-label">PROTECTION FIBER [STANDBY]</text>
+
+                        <!-- Real-time APS Signalling Line -->
+                        <path id="sim-aps-line" d="M 540 140 L 160 140" stroke="#c084fc" stroke-width="3" stroke-dasharray="6 6" fill="none" opacity="0" />
+                        <text id="sim-aps-label" x="350" y="134" fill="#c084fc" font-size="11" font-family="monospace" font-weight="bold" text-anchor="middle" opacity="0">APS Protocol: SF (0xCD 0x01 0x01 0x00)</text>
+
+                        <!-- Node A (Left NE) -->
+                        <rect x="50" y="50" width="110" height="180" rx="16" fill="#0f172a" stroke="#475569" stroke-width="3" />
+                        <text x="105" y="80" fill="#ffffff" font-weight="bold" font-size="16" text-anchor="middle">Node A</text>
+                        <text x="105" y="96" fill="#64748b" font-size="10" font-mono text-anchor="middle">(Head-End)</text>
+                        <!-- Bridge inside Node A -->
+                        <circle cx="105" cy="140" r="14" fill="#1e293b" stroke="#38bdf8" stroke-width="2" />
+                        <text x="105" y="144" fill="#38bdf8" font-size="10" font-weight="bold" text-anchor="middle">B</text>
+                        <line x1="105" y1="140" x2="160" y2="90" stroke="#22c55e" stroke-width="4" id="sim-nodea-top-arm" />
+                        <line x1="105" y1="140" x2="160" y2="190" stroke="#3b82f6" stroke-width="3" id="sim-nodea-bot-arm" />
+                        <line x1="20" y1="140" x2="91" y2="140" stroke="#ffffff" stroke-width="4" />
+                        <text x="28" y="132" fill="#94a3b8" font-size="9" font-mono>CLIENT IN</text>
+
+                        <!-- Node B (Right NE) -->
+                        <rect x="540" y="50" width="110" height="180" rx="16" fill="#0f172a" stroke="#475569" stroke-width="3" />
+                        <text x="595" y="80" fill="#ffffff" font-weight="bold" font-size="16" text-anchor="middle">Node B</text>
+                        <text x="595" y="96" fill="#64748b" font-size="10" font-mono text-anchor="middle">(Tail-End)</text>
+                        <!-- Selector inside Node B -->
+                        <circle cx="595" cy="140" r="14" fill="#1e293b" stroke="#22c55e" stroke-width="2" id="sim-sel-center" />
+                        <text x="595" y="144" fill="#22c55e" font-size="10" font-weight="bold" text-anchor="middle" id="sim-sel-letter">S</text>
+                        <!-- Selector Switching Arm -->
+                        <line id="sim-sel-arm" x1="595" y1="140" x2="540" y2="90" stroke="#22c55e" stroke-width="4" />
+                        <line x1="609" y1="140" x2="680" y2="140" stroke="#ffffff" stroke-width="4" />
+                        <text x="620" y="132" fill="#94a3b8" font-size="9" font-mono>CLIENT OUT</text>
+                    </svg>
+
+                </div>
+
+                <!-- Interactive Injection Toolbar -->
+                <div class="bg-slate-900 p-6 border-t border-slate-800 space-y-4">
+                    <div class="text-xs font-bold text-slate-400 uppercase tracking-wider">Simulate Events & Injections:</div>
+                    
+                    <div class="flex flex-wrap gap-3">
+                        <button onclick="injectCut()" id="btn-sim-cut" class="px-5 py-3 rounded-xl bg-red-600 hover:bg-red-500 font-bold text-white text-xs sm:text-sm shadow-lg shadow-red-600/30 transition transform hover:-translate-y-0.5 flex items-center gap-2">
+                            <span>✂️</span> Cut Working Fiber (Inject LOS)
+                        </button>
+
+                        <button onclick="injectDegrade()" id="btn-sim-deg" class="px-5 py-3 rounded-xl bg-amber-600 hover:bg-amber-500 font-bold text-white text-xs sm:text-sm shadow-lg shadow-amber-600/30 transition transform hover:-translate-y-0.5 flex items-center gap-2">
+                            <span>⚠️</span> Degrade Signal (Inject BER > 10⁻⁵)
+                        </button>
+
+                        <button onclick="injectLockout()" id="btn-sim-lop" class="px-5 py-3 rounded-xl bg-purple-600 hover:bg-purple-500 font-bold text-white text-xs sm:text-sm shadow-lg shadow-purple-600/30 transition transform hover:-translate-y-0.5 flex items-center gap-2">
+                            <span>🔒</span> Lockout of Protection (LoP)
+                        </button>
+
+                        <button onclick="repairFiber()" id="btn-sim-repair" class="px-5 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 font-bold text-white text-xs sm:text-sm shadow-lg shadow-emerald-600/30 transition transform hover:-translate-y-0.5 flex items-center gap-2">
+                            <span>🔌</span> Repair Fiber (Start WTR Timer)
+                        </button>
+                    </div>
+
+                    <!-- Step-by-Step Execution Log Console -->
+                    <div class="mt-4 bg-slate-950 rounded-xl p-4 border border-slate-800 font-mono text-xs space-y-1.5" id="sim-log-console">
+                        <div class="text-emerald-400">[0.000 ms] System initialized. 1+1 Bidirectional protection active. Working path healthy.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MODULE 7: SUMMARY & KNOWLEDGE CHECK -->
+        <section class="space-y-8">
+            <div class="border-b border-slate-800 pb-4">
+                <div class="text-xs font-bold text-blue-400 tracking-wider uppercase">Module 7</div>
+                <h2 class="text-2xl sm:text-3xl font-bold text-white mt-1">Standards Cross-Reference & Key Takeaways</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-slate-800/60 rounded-2xl p-6 border border-slate-700/60 space-y-4">
+                    <h3 class="text-lg font-bold text-white">Key Rule Summary</h3>
+                    <ul class="text-sm text-slate-300 space-y-2.5 list-disc ml-5">
+                        <li><strong>1+1 Unidir:</strong> Permanent Bridge, Local Selector, No APS required. Fastest switch.</li>
+                        <li><strong>1+1 Bidir:</strong> Permanent Bridge, APS protocol synchronizes both selectors for symmetric latency.</li>
+                        <li><strong>1:1 Bidir:</strong> Switched Bridge, supports Extra Traffic on backup line, APS protocol required.</li>
+                        <li><strong>1:N Bidir:</strong> Single protection shared by N working lines. Priority table resolves race conditions.</li>
+                        <li><strong>SNC/S:</strong> Uses Tandem Connection Monitoring (TCM) to protect sub-domains without end-to-end impact.</li>
+                        <li><strong>Switching SLA:</strong> Total switch time must remain under 50 ms.</li>
+                    </ul>
+                </div>
+
+                <div class="bg-slate-800/60 rounded-2xl p-6 border border-slate-700/60 space-y-4">
+                    <h3 class="text-lg font-bold text-white">ITU-T Standards Document Index</h3>
+                    <div class="text-xs font-mono space-y-2 text-slate-300">
+                        <div class="p-2.5 rounded bg-slate-900 border border-slate-800"><strong class="text-blue-400">ITU-T G.873.1:</strong> Linear Protection (1+1, 1:1, 1:N, SNC/I, SNC/S, APS 4-byte format).</div>
+                        <div class="p-2.5 rounded bg-slate-900 border border-slate-800"><strong class="text-blue-400">ITU-T G.873.2:</strong> ODU Shared Ring Protection (OSPRing, Wrapping vs Steering).</div>
+                        <div class="p-2.5 rounded bg-slate-900 border border-slate-800"><strong class="text-blue-400">ITU-T G.709:</strong> OTN Frame Map, Row 4 Col 5-8 APS/PCC overhead allocation.</div>
+                        <div class="p-2.5 rounded bg-slate-900 border border-slate-800"><strong class="text-blue-400">ITU-T G.798:</strong> Equipment Functional Blocks & Defect Detection (LOS, AIS, SSF, SSD).</div>
+                        <div class="p-2.5 rounded bg-slate-900 border border-slate-800"><strong class="text-blue-400">ITU-T G.808.1:</strong> Generic Linear Protection Switching Definitions.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Interactive JavaScript Engine -->
+    <script>
+        // Architecture Data Store
+        const archData = {
+            '1plus1_unidir': {
+                title: '1+1 Unidirectional Architecture',
+                badge: 'Permanent Bridge',
+                badgeClass: 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30',
+                apsReq: 'No APS Required',
+                desc: 'The Head-End (Node A) uses a permanent optical splitter/bridge to continuously broadcast client data onto both Working and Protection fibers simultaneously. The Tail-End (Node B) monitors the Working fiber locally. When a defect occurs, Node B flips its selector immediately without waiting to message Node A.',
+                trigger: 'Local Tail-End Defect (LOS / SD)',
+                efficiency: '50% (Dedicated Redundancy)',
+                speed: 'Fastest (< 10ms - Local Detection Only)',
+                showAps: false,
+                is1plus1: true
+            },
+            '1plus1_bidir': {
+                title: '1+1 Bidirectional Architecture',
+                badge: 'Permanent Bridge + APS Protocol',
+                badgeClass: 'bg-blue-500/20 text-blue-300 border border-blue-500/30',
+                apsReq: 'APS Protocol Required (Row 4)',
+                desc: 'Like 1+1 Unidirectional, the bridge permanently duplicates data onto both lines. However, when a unidirectional fiber cut occurs (e.g. A->B breaks, but B->A is fine), Node B detects the defect and transmits an APS message (Signal Fail) back to Node A. Both Node A and Node B switch their selectors to Protection, maintaining identical transmission delay in both directions.',
+                trigger: 'Local Defect + Remote APS Signaling',
+                efficiency: '50% (Dedicated Redundancy)',
+                speed: 'Sub-50ms (Symmetric Latency Assured)',
+                showAps: true,
+                is1plus1: true
+            },
+            '1to1_bidir': {
+                title: '1:1 Bidirectional Architecture (Extra Traffic)',
+                badge: 'Switched Bridge',
+                badgeClass: 'bg-purple-500/20 text-purple-300 border border-purple-500/30',
+                apsReq: 'APS Protocol Required',
+                desc: 'In 1:1 architecture, the Head-End uses a Switched Bridge. Data is sent ONLY on the Working path during normal operation. The Protection path is idle and can carry low-priority, pre-emptible "Extra Traffic". When Working fails, APS coordinates both ends to drop Extra Traffic and bridge normal traffic onto Protection.',
+                trigger: 'Defect + Bridge/Selector APS Handshake',
+                efficiency: '100% (Usable for Extra Traffic when idle)',
+                speed: 'Sub-50ms (Coordinated Switch)',
+                showAps: true,
+                is1plus1: false
+            },
+            '1ton_bidir': {
+                title: '1:N Bidirectional Architecture (N Working : 1 Protection)',
+                badge: 'Shared Protection Pool',
+                badgeClass: 'bg-amber-500/20 text-amber-300 border border-amber-500/30',
+                apsReq: 'APS Protocol Required (Signal ID)',
+                desc: 'N distinct Working paths (e.g. Working #1 to #8) share a single common Protection entity. When any working channel fails, the APS Byte 2 indicates the exact failing signal index (1–254). If multiple lines fail simultaneously, the standard priority table resolves which signal receives protection.',
+                trigger: 'APS Signal ID Priority Arbitration',
+                efficiency: 'Highest (N/(N+1) Resource Utilization)',
+                speed: 'Sub-50ms (Priority Resolving)',
+                showAps: true,
+                is1plus1: false
+            }
+        };
+
+        function selectArch(key) {
+            const data = archData[key];
+            if (!data) return;
+
+            // Update Tab UI
+            document.querySelectorAll('.arch-tab-btn').forEach(btn => {
+                btn.className = 'arch-tab-btn px-4 py-2 rounded-xl text-sm font-bold bg-slate-800 text-slate-400 hover:text-slate-200 transition';
+            });
+            document.getElementById('btn-' + key).className = 'arch-tab-btn px-4 py-2 rounded-xl text-sm font-bold bg-blue-600 text-white shadow-lg transition';
+
+            // Update Text Content
+            document.getElementById('arch-diagram-title').innerText = data.title;
+            document.getElementById('arch-title').innerText = data.title;
+            document.getElementById('arch-badge').innerText = data.badge;
+            document.getElementById('arch-badge').className = 'px-2.5 py-1 rounded-full text-xs font-bold ' + data.badgeClass;
+            document.getElementById('arch-aps-req').innerText = data.apsReq;
+            document.getElementById('arch-desc').innerText = data.desc;
+            document.getElementById('arch-trigger').innerText = data.trigger;
+            document.getElementById('arch-efficiency').innerText = data.efficiency;
+            document.getElementById('arch-speed').innerText = data.speed;
+
+            // Update SVG elements
+            const apsLine = document.getElementById('svg-aps-line');
+            const apsText = document.getElementById('svg-aps-text');
+            if (data.showAps) {
+                apsLine.setAttribute('opacity', '1');
+                apsText.setAttribute('opacity', '1');
+            } else {
+                apsLine.setAttribute('opacity', '0');
+                apsText.setAttribute('opacity', '0');
+            }
+
+            const bridgeProtConn = document.getElementById('svg-bridge-prot-conn');
+            if (data.is1plus1) {
+                bridgeProtConn.setAttribute('stroke', '#3b82f6');
+                bridgeProtConn.setAttribute('stroke-dasharray', 'none');
+            } else {
+                bridgeProtConn.setAttribute('stroke', '#64748b');
+                bridgeProtConn.setAttribute('stroke-dasharray', '4 4');
+            }
+        }
+
+        // Live APS Calculator
+        function updateApsCalc() {
+            const req = document.getElementById('calc-req').value;
+            const b = document.getElementById('calc-b').value;
+            const d = document.getElementById('calc-d').value;
+            const r = document.getElementById('calc-r').value;
+            const reqSig = document.getElementById('calc-req-sig').value;
+
+            // Byte 1: Req (4 bits) + A (1=1, fixed) + B (1 bit) + D (1 bit) + R (1 bit)
+            const byte1Bin = req + '1' + b + d + r;
+            const byte1Hex = '0x' + parseInt(byte1Bin, 2).toString(16).toUpperCase().padStart(2, '0');
+
+            const byte2Hex = '0x' + parseInt(reqSig, 2).toString(16).toUpperCase().padStart(2, '0');
+            const byte3Hex = byte2Hex; // Bridge signal matches requested signal in normal switch
+            const byte3Bin = reqSig;
+
+            document.getElementById('hex-b1').innerText = byte1Hex;
+            document.getElementById('bin-b1').innerText = byte1Bin.slice(0, 4) + ' ' + byte1Bin.slice(4);
+
+            document.getElementById('hex-b2').innerText = byte2Hex;
+            document.getElementById('bin-b2').innerText = reqSig.slice(0, 4) + ' ' + reqSig.slice(4);
+
+            document.getElementById('hex-b3').innerText = byte3Hex;
+            document.getElementById('bin-b3').innerText = byte3Bin.slice(0, 4) + ' ' + byte3Bin.slice(4);
+
+            // Decode narrative
+            const reqNames = {
+                '1111': 'Lockout of Protection (LoP)',
+                '1110': 'Forced Switch (FS)',
+                '1100': 'Signal Fail (SF)',
+                '1010': 'Signal Degrade (SD)',
+                '1000': 'Manual Switch (MS)',
+                '0110': 'Wait-to-Restore (WTR)',
+                '0100': 'Exercise (EXER)',
+                '0010': 'Reverse Request (RR)',
+                '0001': 'Do Not Revert (DNR)',
+                '0000': 'No Request (NR)'
+            };
+
+            const archName = (b === '0' ? '1+1' : '1:N') + ' ' + (d === '1' ? 'Bidirectional' : 'Unidirectional') + ' ' + (r === '1' ? 'Revertive' : 'Non-Revertive');
+            const sigId = parseInt(reqSig, 2);
+            const sigName = sigId === 0 ? 'Null Signal' : (sigId === 255 ? 'Extra Traffic' : `Working Signal #${sigId}`);
+
+            document.getElementById('calc-explanation').innerHTML = 
+                `<strong>Decoded Message:</strong> Node requests <span class="text-amber-400 font-bold">${reqNames[req]}</span> for <span class="text-emerald-400 font-bold">${sigName}</span> using <span class="text-blue-400 font-bold">${archName}</span> architecture.`;
+        }
+
+        // Live Simulator Engine
+        let simState = 'NORMAL'; // NORMAL, FAULT_SF, FAULT_SD, LOCKOUT, WTR
+        let simTimer = null;
+
+        function logSim(timeMs, msg, type = 'info') {
+            const consoleEl = document.getElementById('sim-log-console');
+            const colorClass = type === 'crit' ? 'text-red-400 font-bold' : (type === 'warn' ? 'text-amber-400' : (type === 'success' ? 'text-emerald-400 font-bold' : 'text-slate-300'));
+            const row = document.createElement('div');
+            row.className = colorClass;
+            row.innerText = `[+${timeMs.toFixed(3)} ms] ${msg}`;
+            consoleEl.prepend(row);
+        }
+
+        function resetSimulator() {
+            clearTimeout(simTimer);
+            simState = 'NORMAL';
+            
+            // Visual Resets
+            document.getElementById('sim-status-dot').className = 'w-3 h-3 rounded-full bg-emerald-400 animate-pulse';
+            document.getElementById('sim-status-text').innerText = 'Network State: NORMAL (Carrying Traffic on Working Entity)';
+            
+            document.getElementById('sim-working-line').setAttribute('stroke', '#22c55e');
+            document.getElementById('sim-working-flow').setAttribute('opacity', '0.9');
+            document.getElementById('sim-working-label').innerText = 'WORKING FIBER [ACTIVE]';
+            document.getElementById('sim-working-label').setAttribute('fill', '#22c55e');
+
+            document.getElementById('sim-fault-marker').setAttribute('opacity', '0');
+
+            document.getElementById('sim-prot-line').setAttribute('stroke', '#3b82f6');
+            document.getElementById('sim-prot-flow').setAttribute('opacity', '0');
+            document.getElementById('sim-prot-label').innerText = 'PROTECTION FIBER [STANDBY]';
+            document.getElementById('sim-prot-label').setAttribute('fill', '#3b82f6');
+
+            document.getElementById('sim-aps-line').setAttribute('opacity', '0');
+            document.getElementById('sim-aps-label').setAttribute('opacity', '0');
+
+            // Reset Selector Arm to Working (y2=90)
+            document.getElementById('sim-sel-arm').setAttribute('y2', '90');
+            document.getElementById('sim-sel-center').setAttribute('stroke', '#22c55e');
+            document.getElementById('sim-sel-letter').setAttribute('fill', '#22c55e');
+
+            // Reset buttons
+            document.querySelectorAll('#mod-simulator button').forEach(b => b.disabled = false);
+
+            document.getElementById('sim-log-console').innerHTML = '<div class="text-emerald-400">[0.000 ms] System reset to NORMAL state. Working path fully active.</div>';
+        }
+
+        function injectCut() {
+            if (simState !== 'NORMAL') return;
+            simState = 'FAULT_SF';
+
+            document.getElementById('btn-sim-cut').disabled = true;
+            document.getElementById('btn-sim-deg').disabled = true;
+            document.getElementById('btn-sim-lop').disabled = true;
+
+            // Step 1: 0ms - Fiber cut occurs
+            logSim(0.0, 'PHYSICAL EVENT: Fiber severed on Working line (Backhoe / cable cut). Photons cease.', 'crit');
+            document.getElementById('sim-status-dot').className = 'w-3 h-3 rounded-full bg-red-500 animate-pulse';
+            document.getElementById('sim-status-text').innerText = 'Network State: FAULT DETECTED (Signal Fail - Cut in Progress)';
+            
+            document.getElementById('sim-fault-marker').setAttribute('opacity', '1');
+            document.getElementById('sim-working-line').setAttribute('stroke', '#ef4444');
+            document.getElementById('sim-working-flow').setAttribute('opacity', '0');
+            document.getElementById('sim-working-label').innerText = 'WORKING FIBER [LOS DEFECT]';
+            document.getElementById('sim-working-label').setAttribute('fill', '#ef4444');
+
+            // Step 2: 2ms - Node B Framer declares LOS -> SSF
+            simTimer = setTimeout(() => {
+                logSim(2.35, 'Node B Optical Receiver detects Loss of Signal (LOS). Defect converted to Server Signal Fail (SSF).', 'warn');
+            }, 600);
+
+            // Step 3: 8ms - Node B flips selector & transmits APS
+            simTimer = setTimeout(() => {
+                logSim(8.12, 'Node B Tail-End Selector switches to Protection line. Node B floods APS protocol byte with SF (1100).', 'warn');
+                
+                // Flip Selector Arm in Node B to Protection (y2=190)
+                document.getElementById('sim-sel-arm').setAttribute('y2', '190');
+                document.getElementById('sim-sel-center').setAttribute('stroke', '#3b82f6');
+                document.getElementById('sim-sel-letter').setAttribute('fill', '#3b82f6');
+
+                // Show APS Signaling
+                document.getElementById('sim-aps-line').setAttribute('opacity', '1');
+                document.getElementById('sim-aps-label').setAttribute('opacity', '1');
+            }, 1400);
+
+            // Step 4: 28ms - Node A receives APS and validates 3 consecutive frames
+            simTimer = setTimeout(() => {
+                logSim(28.45, 'Node A verifies 3 identical consecutive APS frames from Node B. Node A validates Bidirectional SF request.', 'info');
+            }, 2200);
+
+            // Step 5: 34ms - Traffic fully restored on Protection!
+            simTimer = setTimeout(() => {
+                logSim(34.80, 'PROTECTION COMPLETE: Traffic fully restored over Protection path. Total switch time: 34.8ms (<50ms SLA).', 'success');
+                
+                document.getElementById('sim-status-dot').className = 'w-3 h-3 rounded-full bg-blue-500';
+                document.getElementById('sim-status-text').innerText = 'Network State: RESTORED VIA PROTECTION (Sub-50ms Switch Successful)';
+
+                document.getElementById('sim-prot-flow').setAttribute('opacity', '0.9');
+                document.getElementById('sim-prot-label').innerText = 'PROTECTION FIBER [ACTIVE RESTORED]';
+                document.getElementById('sim-prot-label').setAttribute('fill', '#38bdf8');
+            }, 3000);
+        }
+
+        function injectDegrade() {
+            if (simState !== 'NORMAL') return;
+            simState = 'FAULT_SD';
+
+            logSim(0.0, 'SIGNAL EVENT: Excessive optical noise injected. Bit Error Rate exceeds threshold (BER > 10⁻⁵).', 'warn');
+            document.getElementById('sim-working-line').setAttribute('stroke', '#f59e0b');
+            document.getElementById('sim-working-label').innerText = 'WORKING FIBER [SIGNAL DEGRADE dDEG]';
+            document.getElementById('sim-working-label').setAttribute('fill', '#f59e0b');
+
+            setTimeout(() => {
+                logSim(12.4, 'Node B detects Signal Degrade (SD / Priority 4). APS packet dispatched (1010).', 'warn');
+                document.getElementById('sim-sel-arm').setAttribute('y2', '190');
+                document.getElementById('sim-prot-flow').setAttribute('opacity', '0.9');
+                logSim(38.2, 'Traffic switched to Protection due to Signal Degrade. Bit errors eliminated.', 'success');
+            }, 1000);
+        }
+
+        function injectLockout() {
+            logSim(0.0, 'OPERATOR COMMAND: Lockout of Protection (LoP) invoked. Protection line disabled.', 'crit');
+            document.getElementById('sim-status-text').innerText = 'Network State: LOCKOUT OF PROTECTION (Operator Override - Priority 1)';
+            document.getElementById('sim-prot-line').setAttribute('stroke', '#64748b');
+            document.getElementById('sim-prot-label').innerText = 'PROTECTION FIBER [LOCKED OUT]';
+            document.getElementById('sim-prot-label').setAttribute('fill', '#64748b');
+        }
+
+        function repairFiber() {
+            if (simState === 'NORMAL') return;
+            
+            logSim(0.0, 'MAINTENANCE: Field technician spliced fiber. Optical power returned to normal levels.', 'info');
+            document.getElementById('sim-fault-marker').setAttribute('opacity', '0');
+            document.getElementById('sim-working-line').setAttribute('stroke', '#22c55e');
+            document.getElementById('sim-working-label').innerText = 'WORKING FIBER [STANDBY RESTORED]';
+            document.getElementById('sim-working-label').setAttribute('fill', '#22c55e');
+
+            logSim(1.5, 'Link stable. Initiating ITU-T Wait-to-Restore (WTR) timer countdown (prevents flapping)...', 'warn');
+            document.getElementById('sim-status-text').innerText = 'Network State: WAIT-TO-RESTORE (WTR Timer Running)';
+
+            setTimeout(() => {
+                logSim(5.0, 'WTR Timer expired! Reverting traffic from Protection back to Working path.', 'success');
+                resetSimulator();
+            }, 2500);
+        }
+
+        
+        // Theme toggle
+        const themeToggle = document.getElementById('theme-toggle');
+        const iconSun = document.getElementById('icon-sun');
+        const iconMoon = document.getElementById('icon-moon');
+        const themeText = document.getElementById('theme-text');
+        const htmlEl = document.documentElement;
+
+        function applyTheme(light) {
+            if (light) {
+                htmlEl.classList.add('light');
+                iconSun.classList.remove('hidden');
+                iconMoon.classList.add('hidden');
+                themeText.textContent = 'Dark';
+            } else {
+                htmlEl.classList.remove('light');
+                iconSun.classList.add('hidden');
+                iconMoon.classList.remove('hidden');
+                themeText.textContent = 'Light';
+            }
+        }
+
+        // Initialize from localStorage
+        const saved = localStorage.getItem('otn-theme');
+        if (saved) {
+            applyTheme(saved === 'light');
+        } else {
+            // default dark
+            applyTheme(false);
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const isLight = htmlEl.classList.toggle('light');
+            localStorage.setItem('otn-theme', isLight ? 'light' : 'dark');
+            applyTheme(isLight);
+        });
+
+        // Initialize Calculator on load
+        window.addEventListener('DOMContentLoaded', () => {
+            updateApsCalc();
+        });
+    </script>
+</body>
+</html>
